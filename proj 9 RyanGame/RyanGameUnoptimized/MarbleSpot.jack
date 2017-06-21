@@ -1,0 +1,270 @@
+/**
+ * Implements the playable spots on the Marble Solitaire board.
+ */
+class MarbleSpot {
+    // Location of spot on board
+    field int spotLocation;
+
+    // States of the spot
+    field boolean hasMarble;
+    field Array possibleMoves;
+    field int numPossibleMoves;
+    
+    /** 
+     *  Constructs a new spot with a given location and possibly a 
+     *  marble, and if so, where the marble is allowed to jump to 
+     *  if requested...assuming that the requested jump is valid. 
+     */
+    constructor MarbleSpot new(int spot) {
+        let spotLocation = spot;
+        if(spotLocation = 17) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 5;
+            let possibleMoves[1] = 15;
+            let possibleMoves[2] = 19;
+            let possibleMoves[3] = 29;
+            let hasMarble = false;
+        } else {
+            let hasMarble = true;
+        }
+
+        if(spotLocation = 1) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 3;
+            let possibleMoves[1] = 9;
+        }
+        if(spotLocation = 2) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 10;
+        }
+        if(spotLocation = 3) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 1;
+            let possibleMoves[1] = 11;
+        }
+        if(spotLocation = 4) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 6;
+            let possibleMoves[1] = 16;
+        }
+        if(spotLocation = 5) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 17;
+        }
+        if(spotLocation = 6) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 4;
+            let possibleMoves[1] = 18;
+        }
+        if(spotLocation = 7) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 9;
+            let possibleMoves[1] = 21;
+        }
+        if(spotLocation = 8) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 10;
+            let possibleMoves[1] = 22;
+        }
+        if(spotLocation = 9) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 1;
+            let possibleMoves[1] = 7;
+            let possibleMoves[2] = 11;
+            let possibleMoves[3] = 23;
+        }
+        if(spotLocation = 10) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 2;
+            let possibleMoves[1] = 8;
+            let possibleMoves[2] = 12;
+            let possibleMoves[3] = 24;
+        }
+        if(spotLocation = 11) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 3;
+            let possibleMoves[1] = 9;
+            let possibleMoves[2] = 13;
+            let possibleMoves[3] = 25;
+        }
+        if(spotLocation = 12) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 10;
+            let possibleMoves[1] = 26;
+        }
+        if(spotLocation = 13) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 11;
+            let possibleMoves[1] = 27;
+        }
+        if(spotLocation = 14) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 16;
+        }
+        if(spotLocation = 15) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 17;
+        }
+        if(spotLocation = 16) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 4;
+            let possibleMoves[1] = 14;
+            let possibleMoves[2] = 18;
+            let possibleMoves[3] = 28;
+        }
+        if(spotLocation = 18) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 6;
+            let possibleMoves[1] = 16;
+            let possibleMoves[2] = 20;
+            let possibleMoves[3] = 30;
+        }
+        if(spotLocation = 19) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 17;
+        }
+        if(spotLocation = 20) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 18;
+        }
+        if(spotLocation = 21) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 7;
+            let possibleMoves[1] = 23;
+        }
+        if(spotLocation = 22) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 8;
+            let possibleMoves[1] = 24;
+        }
+        if(spotLocation = 23) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 9;
+            let possibleMoves[1] = 21;
+            let possibleMoves[2] = 25;
+            let possibleMoves[3] = 31;
+        }
+        if(spotLocation = 24) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 10;
+            let possibleMoves[1] = 22;
+            let possibleMoves[2] = 26;
+            let possibleMoves[3] = 32;
+        }
+        if(spotLocation = 25) {
+            let numPossibleMoves = 4;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 11;
+            let possibleMoves[1] = 23;
+            let possibleMoves[2] = 27;
+            let possibleMoves[3] = 33;
+        }
+        if(spotLocation = 26) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 12;
+            let possibleMoves[1] = 24;
+        }
+        if(spotLocation = 27) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 13;
+            let possibleMoves[1] = 25;
+        }
+        if(spotLocation = 28) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 16;
+            let possibleMoves[1] = 30;
+        }
+        if(spotLocation = 29) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 17;
+        }
+        if(spotLocation = 30) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 18;
+            let possibleMoves[1] = 28;
+        }
+        if(spotLocation = 31) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 23;
+            let possibleMoves[1] = 33;
+        }
+        if(spotLocation = 32) {
+            let numPossibleMoves = 1;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 24;
+        }
+        if(spotLocation = 33) {
+            let numPossibleMoves = 2;
+            let possibleMoves = Array.new(numPossibleMoves);
+            let possibleMoves[0] = 25;
+            let possibleMoves[1] = 31;
+        }
+        
+        return this;
+    }
+
+    /** Returns whether the given spot has a marble or is empty. */
+    method boolean hasMarble() {
+        return hasMarble;
+    }
+
+    method int getNumPossibleMoves() {
+        return numPossibleMoves;
+    }
+
+    method Array getPossibleMoves() {
+        return possibleMoves;
+    }
+
+    /** Returns the location of the given spot */
+    method int getLocation() {
+        return spotLocation;
+    }
+
+    method void removeMarble() {
+        let hasMarble = false;
+        return;
+    }
+
+    method void addMarble() {
+        let hasMarble = true;
+        return;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do possibleMoves.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}

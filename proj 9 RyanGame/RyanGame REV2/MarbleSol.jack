@@ -1,0 +1,1029 @@
+/**
+ * Implements the graphics required for the marble solitaire game.
+ * It also has methods for drawing, erasing, moving on the 
+ * screen.
+ */
+class MarbleSol {
+
+    field int location;             // Location of cursor on the board
+    field int selectedSpot;         // The selected spot on board
+    field Array board;              // The board itself
+    
+    static int up, down, left, right;
+
+    /** Constructs a new square with a given location and size. */
+    constructor MarbleSol new() {
+        var int i;
+        let up    = 1;
+        let down  = 2;
+        let left  = 3;
+        let right = 4;
+        let location = 17;                       // center of board
+        let selectedSpot = -1;                   // no selected position
+        let board = Array.new(33);
+        let i = 0;
+        while(i < 33) {                          // loop to initiate all 33 board locations
+            let board[i] = MarbleSpot.new((i + 1));
+            let i = i + 1;
+        }
+        do MarbleSol.drawBoard();
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        var int i;
+        let i = 0;
+        while(i < 33) {                          // loop to free all 33 MarbleSpots
+            do board[i].dispose();
+            let i = i + 1;
+        }
+        do board.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Get the current cursor location */
+    method int getCursor() {
+        return location;
+    }
+
+    method void selectSpot() {
+        if((selectedSpot = -1) & (board[(location - 1)].hasMarble())) {
+            let selectedSpot = location;
+            do drawSelected(selectedSpot, false);
+            return;
+        }
+        if(~(selectedSpot = location)) {
+            if(checkLegalJump()) {
+               do board[(location - 1)].addMarble;
+               do board[(selectedSpot - 1)].removeMarble;
+               do board[((getMidSpot()) - 1)].removeMarble;
+               do drawMarble(selectedSpot, true);
+               do drawMarble(getMidSpot(), true);
+               do drawMarble(location, false);
+               do deselectSpot();
+               let selectedSpot = location;
+               return; 
+            } else {
+                if(~(selectedSpot = -1)) {
+                    do deselectSpot();
+                } else {
+                    return;
+                }
+            }
+        } else {                                // Deselect if spot is already selected
+            do deselectSpot();
+        }
+        return;
+    }
+    
+    method int getMidSpot() {
+        i
+    }
+        
+    method boolean checkLegalJump() {
+        var int i, numPossibleMove, possMove;
+        var Array move;
+        var boolean canJump;
+        let i = 0;
+        let canJump = false;
+
+        if(selectedSpot = -1) {
+            return canJump;
+        } else {                           // a spot was prev selected
+            if(board[(location - 1)].hasMarble()) {
+                do deselectSpot();
+                let selectedSpot = location;
+                do drawSelected(selectedSpot, false);
+                return canJump;
+            } else {                       // no marble
+                let numPossibleMove = board[(location - 1)].getNumPossibleMoves();
+                let move = board[(location - 1)].getPossibleMoves();
+                while(i < numPossibleMove) {
+                    if(move = location) {
+                        let canJump = true;
+                    } else {
+                        let canJump = false;
+                    }
+                    let i = i + 1;
+                }
+            }
+        }		
+    }
+
+    method void deselectSpot() {                // Deselect a spot means no spot will be selected
+        do drawSelected(selectedSpot, true);
+        let selectedSpot = -1;
+        return;
+    }
+    
+    method int getSelectedSpot() {
+        return selectedSpot;
+    } 
+
+//----------------------------------------------------------------------------
+
+    method void moveCursor(int direction) {
+        if ((location = 1) & ~(direction = left) & ~(direction = up)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 4;
+            } else {                    // right
+                let location = 2;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 2) & ~(direction = up)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 5;
+            } else {
+                if(direction = right) { // right
+                    let location = 3;   
+                } else {                // left
+                    let location = 1;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 3) & ~(direction = up) & ~(direction = right)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down            
+                let location = 6;
+            } else {                    // left
+                let location = 2;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 4) & ~(direction = left)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 9;
+            } else {
+                if(direction = right) { // right
+                    let location = 5;   
+                } else {                // up
+                    let location = 1;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 5) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 10;
+            } else {
+                if(direction = up) {        // up
+                    let location = 2;
+                } else {
+                    if(direction = right) { // right
+                        let location = 6;
+                    } else {                // left
+                        let location = 4;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 6) & ~(direction = right)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 11;
+            } else {
+                if(direction = left) {  // left
+                    let location = 5;   
+                } else {                // up
+                    let location = 3;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 7) & ~(direction = up) & ~(direction = left)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 14;
+            } else {                    // right
+                let location = 8;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 8) & ~(direction = up)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 15;
+            } else {
+                if(direction = left) {  // left
+                    let location = 7;   
+                } else {                // right
+                    let location = 9;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 9) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 16;
+            } else {
+                if(direction = up) {        // up
+                    let location = 4;
+                } else {
+                    if(direction = right) { // right
+                        let location = 10;
+                    } else {                // left
+                        let location = 8;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 10) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 17;
+            } else {
+                if(direction = up) {        // up
+                    let location = 5;
+                } else {
+                    if(direction = right) { // right
+                        let location = 11;
+                    } else {                // left
+                        let location = 9;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 11) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 18;
+            } else {
+                if(direction = up) {        // up
+                    let location = 6;
+                } else {
+                    if(direction = right) { // right
+                        let location = 12;
+                    } else {                // left
+                        let location = 10;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 12) & ~(direction = up)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 19;
+            } else {
+                if(direction = left) {  // left
+                    let location = 11;   
+                } else {                // right
+                    let location = 13;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 13) & ~(direction = up) & ~(direction = right)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down            
+                let location = 20;
+            } else {                    // left
+                let location = 12;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 14) & ~(direction = left)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 21;
+            } else {
+                if(direction = right) { // right
+                    let location = 15;   
+                } else {                // up
+                    let location = 7;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 15) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 22;
+            } else {
+                if(direction = up) {        // up
+                    let location = 8;
+                } else {
+                    if(direction = right) { // right
+                        let location = 16;
+                    } else {                // left
+                        let location = 14;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 16) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 23;
+            } else {
+                if(direction = up) {        // up
+                    let location = 9;
+                } else {
+                    if(direction = right) { // right
+                        let location = 17;
+                    } else {                // left
+                        let location = 15;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 17) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 24;
+            } else {
+                if(direction = up) {        // up
+                    let location = 10;
+                } else {
+                    if(direction = right) { // right
+                        let location = 18;
+                    } else {                // left
+                        let location = 16;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 18) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 25;
+            } else {
+                if(direction = up) {        // up
+                    let location = 11;
+                } else {
+                    if(direction = right) { // right
+                        let location = 19;
+                    } else {                // left
+                        let location = 17;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 19) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 26;
+            } else {
+                if(direction = up) {        // up
+                    let location = 12;
+                } else {
+                    if(direction = right) { // right
+                        let location = 20;
+                    } else {                // left
+                        let location = 18;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 20) & ~(direction = right)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {      // down
+                let location = 27;
+            } else {
+                if(direction = left) {  // left
+                    let location = 19;   
+                } else {                // up
+                    let location = 13;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 21) & ~(direction = down) & ~(direction = left)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = up)   {      // up
+                let location = 14;
+            } else {                    // right
+                let location = 22;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 22) & ~(direction = down)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = right) {     // right
+                let location = 23;
+            } else {
+                if(direction = left) {  // left
+                    let location = 21;   
+                } else {                // up
+                    let location = 15;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 23) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 28;
+            } else {
+                if(direction = up) {        // up
+                    let location = 16;
+                } else {
+                    if(direction = right) { // right
+                        let location = 24;
+                    } else {                // left
+                        let location = 22;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 24) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 29;
+            } else {
+                if(direction = up) {        // up
+                    let location = 17;
+                } else {
+                    if(direction = right) { // right
+                        let location = 25;
+                    } else {                // left
+                        let location = 23;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 25) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 30;
+            } else {
+                if(direction = up) {        // up
+                    let location = 18;
+                } else {
+                    if(direction = right) { // right
+                        let location = 26;
+                    } else {                // left
+                        let location = 24;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 26) & ~(direction = down)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = right) {     // right
+                let location = 27;
+            } else {
+                if(direction = left) {  // left
+                    let location = 25;   
+                } else {                // up
+                    let location = 19;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 27) & ~(direction = down) & ~(direction = right)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = up)   {      // up
+                let location = 20;
+            } else {                    // left
+                let location = 26;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 28) & ~(direction = left)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = right) {     // right
+                let location = 29;
+            } else {
+                if(direction = down) {  // down
+                    let location = 31;   
+                } else {                // up
+                    let location = 23;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if (location = 29) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = down) {          // down
+                let location = 32;
+            } else {
+                if(direction = up) {        // up
+                    let location = 24;
+                } else {
+                    if(direction = right) { // right
+                        let location = 30;
+                    } else {                // left
+                        let location = 28;    
+                    }
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 30) & ~(direction = right)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = left) {      // left
+                let location = 29;
+            } else {
+                if(direction = down) {  // down
+                    let location = 33;   
+                } else {                // up
+                    let location = 25;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 31) & ~(direction = down) & ~(direction = left)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = up) {        // up
+                let location = 28;
+            } else {                    // right
+                let location = 32;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 32) & ~(direction = down)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = up) {        // up
+                let location = 29;
+            } else {
+                if(direction = right) { // right
+                    let location = 33;   
+                } else {                // left
+                    let location = 31;
+                }
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        if ((location = 33) & ~(direction = right) & ~(direction = down)) {
+            do MarbleSol.drawCursor(location, true);
+            if(direction = up) {        // up            
+                let location = 30;
+            } else {                    // left
+                let location = 32;
+            }
+            do MarbleSol.drawCursor(location, false);
+            return;
+        }
+        return;
+    }
+
+//----------------------------------------------------------------------------
+
+    function void drawCursor(int location, boolean erase) {
+        var int cx, cy;
+        
+        let cx = 256;
+        let cy = 128;
+        
+        if(location = 1) {
+            let cy = cy - 90;
+            let cx = cx - 30;
+        }
+        if(location = 2) {
+            let cy = cy - 90;
+        }
+        if(location = 3) {
+            let cy = cy - 90;
+            let cx = cx + 30;
+        }
+        if(location = 4) {
+            let cy = cy - 60;
+            let cx = cx - 30;
+        }
+        if(location = 5) {
+            let cy = cy - 60;
+        }
+        if(location = 6) {
+            let cy = cy - 60;
+            let cx = cx + 30;
+        }
+        if(location = 7) {
+            let cy = cy - 30;
+            let cx = cx - 90;
+        }
+        if(location = 8) {
+            let cy = cy - 30;
+            let cx = cx - 60;
+        }
+        if(location = 9) {
+            let cy = cy - 30;
+            let cx = cx - 30;
+        }
+        if(location = 10) {
+            let cy = cy - 30;
+        }        
+        if(location = 11) {
+            let cy = cy - 30;
+            let cx = cx + 30;
+        }
+        if(location = 12) {
+            let cy = cy - 30;
+            let cx = cx + 60;
+        }
+        if(location = 13) {
+            let cy = cy - 30;
+            let cx = cx + 90;
+        }
+        if(location = 14) {
+            let cx = cx - 90;
+        }
+        if(location = 15) {
+            let cx = cx - 60;
+        }
+        if(location = 16) {
+            let cx = cx - 30;
+        }
+        if(location = 18) {
+            let cx = cx + 30;
+        }
+        if(location = 19) {
+            let cx = cx + 60;
+        }
+        if(location = 20) {
+            let cx = cx + 90;
+        }
+        if(location = 21) {
+            let cy = cy + 30;
+            let cx = cx - 90;
+        }
+        if(location = 22) {
+            let cy = cy + 30;
+            let cx = cx - 60;
+        }
+        if(location = 23) {
+            let cy = cy + 30;
+            let cx = cx - 30;
+        }
+        if(location = 24) {
+            let cy = cy + 30;
+        }
+        if(location = 25) {
+            let cy = cy + 30;
+            let cx = cx + 30;
+        }
+        if(location = 26) {
+            let cy = cy + 30;
+            let cx = cx + 60;
+        }
+        if(location = 27) {
+            let cy = cy + 30;
+            let cx = cx + 90;
+        }
+        if(location = 28) {
+            let cy = cy + 60;
+            let cx = cx - 30;
+        }
+        if(location = 29) {
+            let cy = cy + 60;
+        }
+        if(location = 30) {
+            let cy = cy + 60;
+            let cx = cx + 30;
+        }
+        if(location = 31) {
+            let cy = cy + 90;
+            let cx = cx - 30;
+        }
+        if(location = 32) {
+            let cy = cy + 90;
+        }
+        if(location = 33) {
+            let cy = cy + 90;
+            let cx = cx + 30;
+        }
+        
+        if(erase) {
+            do Screen.setColor(true);
+        } else {
+            do Screen.setColor(false);
+        }
+        do Screen.drawLine((cx - 12), (cy - 12), (cx - 12), (cy + 12));
+        do Screen.drawLine((cx - 12), (cy + 12), (cx + 12), (cy + 12));
+        do Screen.drawLine((cx + 12), (cy + 12), (cx + 12), (cy - 12));
+        do Screen.drawLine((cx + 12), (cy - 12), (cx - 12), (cy - 12));
+        
+        return;
+    }
+
+//----------------------------------------------------------------------------
+
+    method void drawSelected(int location, boolean erase) {
+        var int cx, cy;
+        
+        let cx = 256;
+        let cy = 128;
+        
+        if(location = 1) {
+            let cy = cy - 90;
+            let cx = cx - 30;
+        }
+        if(location = 2) {
+            let cy = cy - 90;
+        }
+        if(location = 3) {
+            let cy = cy - 90;
+            let cx = cx + 30;
+        }
+        if(location = 4) {
+            let cy = cy - 60;
+            let cx = cx - 30;
+        }
+        if(location = 5) {
+            let cy = cy - 60;
+        }
+        if(location = 6) {
+            let cy = cy - 60;
+            let cx = cx + 30;
+        }
+        if(location = 7) {
+            let cy = cy - 30;
+            let cx = cx - 90;
+        }
+        if(location = 8) {
+            let cy = cy - 30;
+            let cx = cx - 60;
+        }
+        if(location = 9) {
+            let cy = cy - 30;
+            let cx = cx - 30;
+        }
+        if(location = 10) {
+            let cy = cy - 30;
+        }        
+        if(location = 11) {
+            let cy = cy - 30;
+            let cx = cx + 30;
+        }
+        if(location = 12) {
+            let cy = cy - 30;
+            let cx = cx + 60;
+        }
+        if(location = 13) {
+            let cy = cy - 30;
+            let cx = cx + 90;
+        }
+        if(location = 14) {
+            let cx = cx - 90;
+        }
+        if(location = 15) {
+            let cx = cx - 60;
+        }
+        if(location = 16) {
+            let cx = cx - 30;
+        }
+        if(location = 18) {
+            let cx = cx + 30;
+        }
+        if(location = 19) {
+            let cx = cx + 60;
+        }
+        if(location = 20) {
+            let cx = cx + 90;
+        }
+        if(location = 21) {
+            let cy = cy + 30;
+            let cx = cx - 90;
+        }
+        if(location = 22) {
+            let cy = cy + 30;
+            let cx = cx - 60;
+        }
+        if(location = 23) {
+            let cy = cy + 30;
+            let cx = cx - 30;
+        }
+        if(location = 24) {
+            let cy = cy + 30;
+        }
+        if(location = 25) {
+            let cy = cy + 30;
+            let cx = cx + 30;
+        }
+        if(location = 26) {
+            let cy = cy + 30;
+            let cx = cx + 60;
+        }
+        if(location = 27) {
+            let cy = cy + 30;
+            let cx = cx + 90;
+        }
+        if(location = 28) {
+            let cy = cy + 60;
+            let cx = cx - 30;
+        }
+        if(location = 29) {
+            let cy = cy + 60;
+        }
+        if(location = 30) {
+            let cy = cy + 60;
+            let cx = cx + 30;
+        }
+        if(location = 31) {
+            let cy = cy + 90;
+            let cx = cx - 30;
+        }
+        if(location = 32) {
+            let cy = cy + 90;
+        }
+        if(location = 33) {
+            let cy = cy + 90;
+            let cx = cx + 30;
+        }
+        
+        if(erase) {
+            do Screen.setColor(true);
+        } else {
+            do Screen.setColor(false);
+        }
+        do Screen.drawLine((cx - 13), (cy - 13), (cx - 13), (cy + 13));
+        do Screen.drawLine((cx - 13), (cy + 13), (cx + 13), (cy + 13));
+        do Screen.drawLine((cx + 13), (cy + 13), (cx + 13), (cy - 13));
+        do Screen.drawLine((cx + 13), (cy - 13), (cx - 13), (cy - 13));
+        
+        return;
+    }
+
+//----------------------------------------------------------------------------
+
+    function void drawBoard() {
+        var int x, y, cx, cy;
+        let x = 138;
+        let y = 10;
+        let cx = x + 118;
+        let cy = y + 118;
+
+        do Screen.setColor(true);       // black
+        do Screen.drawRectangle(x, y, (x + 236), (y + 236));
+        
+        do Screen.setColor(false);      // white
+        do MarbleSol.drawCursor(17, false);
+        
+        // Draw middle row of 7 spots
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle((cx + 60), cy, 10);
+        do Screen.drawCircle((cx + 90), cy, 10);
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx - 60), cy, 10);
+        do Screen.drawCircle((cx - 90), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy + 30;
+
+        // Draw next lower row of 7 spots
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle((cx + 60), cy, 10);
+        do Screen.drawCircle((cx + 90), cy, 10);
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx - 60), cy, 10);
+        do Screen.drawCircle((cx - 90), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy + 30;
+
+        // Draw next lower row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy + 30;
+
+        // Draw lowest row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy - 120;
+
+        // Draw next upper row of 7 spots
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle((cx + 60), cy, 10);
+        do Screen.drawCircle((cx + 90), cy, 10);
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx - 60), cy, 10);
+        do Screen.drawCircle((cx - 90), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        // Reset center
+        let cx = x + 118;
+        let cy = y + 118;
+
+        // Draw middle row marbles - no marble on center spot
+        do Screen.setColor(true);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle((cx + 60), cy, 8);
+        do Screen.drawCircle((cx + 90), cy, 8);
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx - 60), cy, 8);
+        do Screen.drawCircle((cx - 90), cy, 8);
+
+        let cy = cy + 30;
+
+        // Draw next lower row marbles
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle((cx + 60), cy, 8);
+        do Screen.drawCircle((cx + 90), cy, 8);
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx - 60), cy, 8);
+        do Screen.drawCircle((cx - 90), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy + 30;
+
+        // Draw next lower row marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy + 30;
+
+        // Draw next lower row marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy - 120;
+
+        // Draw next upper row of marbles
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle((cx + 60), cy, 8);
+        do Screen.drawCircle((cx + 90), cy, 8);
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx - 60), cy, 8);
+        do Screen.drawCircle((cx - 90), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+        
+        return;
+    }
+}

@@ -1,0 +1,61 @@
+/**
+ * Implements the playable spots on the Marble Solitaire board.
+ */
+class MarbleSpot {
+    // States of the spot
+    field boolean hasMarble;
+    field int xCoord, yCoord, location;
+    
+    /** 
+     *  Constructs a new spot with a given location and possibly a 
+     *  marble, and if so, where the marble is allowed to jump to 
+     *  if requested...assuming that the requested jump is valid. 
+     */
+    constructor MarbleSpot new(int x, int y) {
+        if((x < 1) | (x > 7)) {
+            let xCoord = 0;                // Reject spot, illegal coordinate
+            let hasMarble = false;
+        } else {
+            let xCoord = x;
+            let hasMarble = true;
+        }
+        if((y < 1) | (y > 7)) {
+            let yCoord = 0;                // Reject spot, illegal coordinate
+            let hasMarble = false;
+        } else {
+            let yCoord = y;
+            let hasMarble = true;
+        }
+        let location = (x + ((y - 1) * 7));
+        return this;
+    }
+
+    /** Returns whether the given spot has a marble or is empty. */
+    method boolean hasMarble() {
+        return hasMarble;
+    }
+
+    /** Returns the x coordinate of the given spot */
+    method int getX() {
+        return xCoord;
+    }
+
+    /** Returns y coordinate of the given spot */
+    method int getY() {
+        return yCoord;
+    }
+
+    method int getLocation() {
+        return location;
+    }
+    
+    method void removeMarble() {
+        let hasMarble = false;
+        return;
+    }
+
+    method void addMarble() {
+        let hasMarble = true;
+        return;
+    }
+}

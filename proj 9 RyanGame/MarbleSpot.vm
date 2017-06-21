@@ -1,0 +1,93 @@
+function MarbleSpot.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+push constant 1
+lt
+push argument 0
+push constant 7
+gt
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+pop this 1
+push constant 0
+pop this 0
+goto IF_END0
+label IF_FALSE0
+push argument 0
+pop this 1
+push constant 0
+not
+pop this 0
+label IF_END0
+push argument 1
+push constant 1
+lt
+push argument 1
+push constant 7
+gt
+or
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+pop this 2
+push constant 0
+pop this 0
+goto IF_END1
+label IF_FALSE1
+push argument 1
+pop this 2
+push constant 0
+not
+pop this 0
+label IF_END1
+push argument 0
+push argument 1
+push constant 1
+sub
+push constant 7
+call Math.multiply 2
+add
+pop this 3
+push pointer 0
+return
+function MarbleSpot.hasMarble 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function MarbleSpot.getX 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function MarbleSpot.getY 0
+push argument 0
+pop pointer 0
+push this 2
+return
+function MarbleSpot.getLocation 0
+push argument 0
+pop pointer 0
+push this 3
+return
+function MarbleSpot.removeMarble 0
+push argument 0
+pop pointer 0
+push constant 0
+pop this 0
+push constant 0
+return
+function MarbleSpot.addMarble 0
+push argument 0
+pop pointer 0
+push constant 0
+not
+pop this 0
+push constant 0
+return

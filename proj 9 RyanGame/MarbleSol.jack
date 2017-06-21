@@ -1,0 +1,706 @@
+/**
+ * Implements the graphics required for the marble solitaire game.
+ * It also has methods for drawing, erasing, moving on the 
+ * screen.
+ */
+class MarbleSol {
+
+    field int totalSpots;
+    field int totalMarbles;
+    field int location;             // Location of cursor on the board
+    field int xLocation;
+    field int yLocation;
+    field int selectedSpot;         // The selected spot on board
+    field int xSelected;
+    field int ySelected;
+    field Array board;              // The board itself
+    
+    static int up, down, left, right;
+
+    /** Constructs a new square with a given location and size. */
+    constructor MarbleSol new() {
+        var int i, row, col;
+        let up    = 1;
+        let down  = 2;
+        let left  = 3;
+        let right = 4;
+        let xLocation = 4;                       // center of board
+        let yLocation = 4;
+        let location = 25;
+        let xSelected = -1;                      // no selected position
+        let ySelected = -1;
+        let selectedSpot = -1;
+        let board = Array.new(33);
+        let totalSpots = 33;
+        let i = 0;
+        let row = 1;
+        let col = 1;
+        while(i < 33) {                          // loop to initiate all 33 board locations
+            while(col < 8) {
+                while(row < 8) {
+                    if(~(((row = 1) | (row = 2) | (row = 6) | (row = 7)) & ((col = 1) | (col = 2) | (col = 6) | (col = 7)))) {
+                        let board[i] = MarbleSpot.new(col, row);
+                        let i = i + 1;
+                    }
+                    let row = row + 1;
+                }
+                let col = col + 1;
+                let row = 1;
+            }
+        }
+        let totalMarbles = 32;
+        do MarbleSol.drawBoard();
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do board.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void selectSpot() {
+        var MarbleSpot m;
+        let m = board[(location - 1)];
+        if((selectedSpot = -1) & (m.hasMarble())) {
+            let selectedSpot = location;
+            let xSelected = xLocation;
+            let ySelected = yLocation;
+            do drawSelected(selectedSpot, false);
+            return;
+        }
+        if(~(selectedSpot = location)) {
+            if(checkLegalJump()) {
+               do m.addMarble();
+               let m = board[(selectedSpot - 1)];
+               do m.removeMarble();
+               let m = board[((getMidSpot()) - 1)];
+               do m.removeMarble();
+               do drawMarble(selectedSpot, true);
+               do drawMarble(m.getLocation(), true);
+               do drawMarble(location, false);
+               let totalMarbles = totalMarbles - 1;
+               do deselectSpot();
+               do Output.moveCursor(0, 0);
+               do Output.printString("Marbles left: ");
+               do Output.printInt(totalMarbles);
+               do Output.printString(" ");
+               return; 
+            } else {
+                if(m.hasMarble()) {
+                    do deselectSpot();
+                    let selectedSpot = location;
+                    let xSelected = xLocation;
+                    let ySelected = yLocation;
+                    do drawSelected(selectedSpot, false);
+                } else {
+                    do deselectSpot();
+                }
+            }
+        } else {                                // Deselect if spot is already selected
+            do deselectSpot();
+        }
+        return;
+    }
+    
+    method int getMidSpot() {
+        if(location < selectedSpot) {
+            if(xLocation = (xSelected - 2)) {       // left
+                return (((ySelected - 1) * 7) + (xSelected - 1));
+            } else {                                // up
+                return (((ySelected - 2) * 7) + xSelected);
+            }
+        } else {
+            if(xLocation = (xSelected + 2)) {       // right
+                return (((ySelected - 1) * 7) + (xSelected + 1));
+            } else {                                // down
+                return ((ySelected * 7) + xSelected);
+            }
+        }
+    }
+    
+    method boolean gameWon() {          // returns true if game won
+        if(totalMarbles = 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    method boolean gameLost() {          // returns true if game lost
+        if(hasMovesLeft()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    method boolean hasMovesLeft() {
+        return true;
+        /**
+        var int j, origLocation, origSelectedSpot, numPossibleMove;
+        var MarbleSpot m;
+        var Array move;
+        var boolean movesLeft;
+        
+        if(totalMarbles = 1) {          // no moves left, but the game has been won
+            return true;
+        }
+        
+        let movesLeft = false;
+        let origLocation = location;
+        let origSelectedSpot = selectedSpot;
+        let selectedSpot = 1;
+        
+        while((selectedSpot - 1) < 33) {
+            let m = board[(selectedSpot - 1)];
+            let j = 0;
+            if(m.hasMarble()) {
+                let numPossibleMove = m.getNumPossibleMoves();
+                let move = m.getPossibleMoves();
+                while(j < numPossibleMove) {
+                    let location = move[j];
+                    let m = board[((getMidSpot()) - 1)];
+                    if(m.hasMarble()) {
+                        let m = board[(location - 1)];
+                        if(~(m.hasMarble())) {
+                            let movesLeft = true;
+                        }
+                    }
+                    let j = j + 1;
+                }
+            }
+            let selectedSpot = selectedSpot + 1;
+        }
+
+        let location = origLocation;
+        let selectedSpot = origSelectedSpot;
+
+        return movesLeft; 
+        */
+    }
+    
+    method boolean checkLegalJump() {
+        var boolean canJump;
+        var MarbleSpot m;
+        let canJump = false;
+        let m = board[(location - 1)];
+        
+        if(selectedSpot = -1) {
+            return canJump;
+        } else {                           // a spot was prev selected
+            if(m.hasMarble()) {
+                return canJump;
+            } else {                       // no marble
+                let m = board[(getMidSpot() - 1)];
+                if(m.hasMarble()) {
+                    let canJump = true;
+                    return canJump;
+                }
+            }
+        }
+        return canJump;		
+    }
+
+    method void deselectSpot() {                // Deselect a spot means no spot will be selected
+        do drawSelected(selectedSpot, true);
+        let selectedSpot = -1;
+        let xSelected    = -1;
+        let ySelected    = -1;
+        return;
+    }
+    
+//----------------------------------------------------------------------------
+
+    method void moveCursor(int direction) {
+        if(direction = up) {
+            if((yLocation - 1) > 0) {
+                if((xLocation > 5) | (xLocation < 3)) {
+                    if((yLocation - 1) > 2) {
+                        let yLocation = yLocation - 1;
+                    }
+                } else {
+                    let yLocation = yLocation - 1;
+                }
+            }
+        }
+        if(direction = down) {
+            if((yLocation + 1) < 8) {
+                if((xLocation > 5) | (xLocation < 3)) {
+                    if((yLocation + 1) < 6) {
+                        let yLocation = yLocation + 1;
+                    }
+                } else {
+                    let yLocation = yLocation + 1;
+                }
+            }
+        }
+        if(direction = right) {
+            if((xLocation + 1) < 8) {
+                if((yLocation > 5) | (yLocation < 3)) {
+                    if((xLocation + 1) < 6) {
+                        let xLocation = xLocation + 1;
+                    }
+                } else {
+                    let xLocation = xLocation + 1;
+                }
+            }
+        }
+        if(direction = left) {
+            if((xLocation - 1) > 0) {
+                if((yLocation > 5) | (yLocation < 3)) {
+                    if((xLocation - 1) > 2) {
+                        let xLocation = xLocation - 1;
+                    }
+                } else {
+                    let xLocation = xLocation - 1;
+                }
+            }
+        }
+        do MarbleSol.drawCursor(location, true);
+        let location = (((yLocation - 1) * 7) + xLocation);
+        do MarbleSol.drawCursor(location, false);
+        do Output.moveCursor(3, 3);
+        do Output.printInt(xLocation);
+        do Output.printString(", ");
+        do Output.printInt(yLocation);
+        do Output.moveCursor(4, 3);
+        do Output.printInt(location);
+        do Output.printString("  ");
+        return;
+    }
+
+//----------------------------------------------------------------------------
+
+    method void drawMarble(int location, boolean erase) {
+        var int cx, cy;
+        
+        let cx = 256;
+        let cy = 128;
+        
+        if(location = 3) {
+            let cy = cy - 90;
+            let cx = cx - 30;
+        }
+        if(location = 4) {
+            let cy = cy - 90;
+        }
+        if(location = 5) {
+            let cy = cy - 90;
+            let cx = cx + 30;
+        }
+        if(location = 10) {
+            let cy = cy - 60;
+            let cx = cx - 30;
+        }
+        if(location = 11) {
+            let cy = cy - 60;
+        }
+        if(location = 12) {
+            let cy = cy - 60;
+            let cx = cx + 30;
+        }
+        if(location = 15) {
+            let cy = cy - 30;
+            let cx = cx - 90;
+        }
+        if(location = 16) {
+            let cy = cy - 30;
+            let cx = cx - 60;
+        }
+        if(location = 17) {
+            let cy = cy - 30;
+            let cx = cx - 30;
+        }
+        if(location = 18) {
+            let cy = cy - 30;
+        }        
+        if(location = 19) {
+            let cy = cy - 30;
+            let cx = cx + 30;
+        }
+        if(location = 20) {
+            let cy = cy - 30;
+            let cx = cx + 60;
+        }
+        if(location = 21) {
+            let cy = cy - 30;
+            let cx = cx + 90;
+        }
+        if(location = 22) {
+            let cx = cx - 90;
+        }
+        if(location = 23) {
+            let cx = cx - 60;
+        }
+        if(location = 24) {
+            let cx = cx - 30;
+        }
+        if(location = 26) {
+            let cx = cx + 30;
+        }
+        if(location = 27) {
+            let cx = cx + 60;
+        }
+        if(location = 28) {
+            let cx = cx + 90;
+        }
+        if(location = 29) {
+            let cy = cy + 30;
+            let cx = cx - 90;
+        }
+        if(location = 30) {
+            let cy = cy + 30;
+            let cx = cx - 60;
+        }
+        if(location = 31) {
+            let cy = cy + 30;
+            let cx = cx - 30;
+        }
+        if(location = 32) {
+            let cy = cy + 30;
+        }
+        if(location = 33) {
+            let cy = cy + 30;
+            let cx = cx + 30;
+        }
+        if(location = 34) {
+            let cy = cy + 30;
+            let cx = cx + 60;
+        }
+        if(location = 35) {
+            let cy = cy + 30;
+            let cx = cx + 90;
+        }
+        if(location = 38) {
+            let cy = cy + 60;
+            let cx = cx - 30;
+        }
+        if(location = 39) {
+            let cy = cy + 60;
+        }
+        if(location = 40) {
+            let cy = cy + 60;
+            let cx = cx + 30;
+        }
+        if(location = 45) {
+            let cy = cy + 90;
+            let cx = cx - 30;
+        }
+        if(location = 46) {
+            let cy = cy + 90;
+        }
+        if(location = 47) {
+            let cy = cy + 90;
+            let cx = cx + 30;
+        }
+        
+        if(erase) {
+            do Screen.setColor(false);
+        } else {
+            do Screen.setColor(true);
+        }
+
+        do Screen.drawCircle(cx, cy, 8);
+        
+        return;
+    }
+
+//----------------------------------------------------------------------------
+
+    function void drawCursor(int location, boolean erase) {
+        var int offset;
+        let offset = 12;
+        do MarbleSol.drawSquare(location, erase, offset);
+        return;
+    }
+    
+//----------------------------------------------------------------------------
+    
+    method void drawSelected(int location, boolean erase) {
+        var int offset;
+        let offset = 13;
+        do MarbleSol.drawSquare(location, erase, offset);
+        return;
+    }
+    
+//----------------------------------------------------------------------------
+
+    function void drawSquare(int location, boolean erase, int offset) {
+        var int cx, cy;
+        
+        let cx = 256;
+        let cy = 128;
+        
+        if(location = 3) {
+            let cy = cy - 90;
+            let cx = cx - 30;
+        }
+        if(location = 4) {
+            let cy = cy - 90;
+        }
+        if(location = 5) {
+            let cy = cy - 90;
+            let cx = cx + 30;
+        }
+        if(location = 10) {
+            let cy = cy - 60;
+            let cx = cx - 30;
+        }
+        if(location = 11) {
+            let cy = cy - 60;
+        }
+        if(location = 12) {
+            let cy = cy - 60;
+            let cx = cx + 30;
+        }
+        if(location = 15) {
+            let cy = cy - 30;
+            let cx = cx - 90;
+        }
+        if(location = 16) {
+            let cy = cy - 30;
+            let cx = cx - 60;
+        }
+        if(location = 17) {
+            let cy = cy - 30;
+            let cx = cx - 30;
+        }
+        if(location = 18) {
+            let cy = cy - 30;
+        }        
+        if(location = 19) {
+            let cy = cy - 30;
+            let cx = cx + 30;
+        }
+        if(location = 20) {
+            let cy = cy - 30;
+            let cx = cx + 60;
+        }
+        if(location = 21) {
+            let cy = cy - 30;
+            let cx = cx + 90;
+        }
+        if(location = 22) {
+            let cx = cx - 90;
+        }
+        if(location = 23) {
+            let cx = cx - 60;
+        }
+        if(location = 24) {
+            let cx = cx - 30;
+        }
+        if(location = 26) {
+            let cx = cx + 30;
+        }
+        if(location = 27) {
+            let cx = cx + 60;
+        }
+        if(location = 28) {
+            let cx = cx + 90;
+        }
+        if(location = 29) {
+            let cy = cy + 30;
+            let cx = cx - 90;
+        }
+        if(location = 30) {
+            let cy = cy + 30;
+            let cx = cx - 60;
+        }
+        if(location = 31) {
+            let cy = cy + 30;
+            let cx = cx - 30;
+        }
+        if(location = 32) {
+            let cy = cy + 30;
+        }
+        if(location = 33) {
+            let cy = cy + 30;
+            let cx = cx + 30;
+        }
+        if(location = 34) {
+            let cy = cy + 30;
+            let cx = cx + 60;
+        }
+        if(location = 35) {
+            let cy = cy + 30;
+            let cx = cx + 90;
+        }
+        if(location = 38) {
+            let cy = cy + 60;
+            let cx = cx - 30;
+        }
+        if(location = 39) {
+            let cy = cy + 60;
+        }
+        if(location = 40) {
+            let cy = cy + 60;
+            let cx = cx + 30;
+        }
+        if(location = 45) {
+            let cy = cy + 90;
+            let cx = cx - 30;
+        }
+        if(location = 46) {
+            let cy = cy + 90;
+        }
+        if(location = 47) {
+            let cy = cy + 90;
+            let cx = cx + 30;
+        }
+        
+        if(erase) {
+            do Screen.setColor(true);
+        } else {
+            do Screen.setColor(false);
+        }
+        do Screen.drawLine((cx - offset), (cy - offset), (cx - offset), (cy + offset));
+        do Screen.drawLine((cx - offset), (cy + offset), (cx + offset), (cy + offset));
+        do Screen.drawLine((cx + offset), (cy + offset), (cx + offset), (cy - offset));
+        do Screen.drawLine((cx + offset), (cy - offset), (cx - offset), (cy - offset));
+        
+        return;
+    }
+
+//----------------------------------------------------------------------------
+
+    function void drawBoard() {
+        var int x, y, cx, cy;
+        let x = 138;
+        let y = 10;
+        let cx = x + 118;
+        let cy = y + 118;
+
+        do Screen.setColor(true);       // black
+        do Screen.drawRectangle(x, y, (x + 236), (y + 236));
+        
+        do Screen.setColor(false);      // white
+        do MarbleSol.drawCursor(25, false);
+        
+        // Draw middle row of 7 spots
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle((cx + 60), cy, 10);
+        do Screen.drawCircle((cx + 90), cy, 10);
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx - 60), cy, 10);
+        do Screen.drawCircle((cx - 90), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy + 30;
+
+        // Draw next lower row of 7 spots
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle((cx + 60), cy, 10);
+        do Screen.drawCircle((cx + 90), cy, 10);
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx - 60), cy, 10);
+        do Screen.drawCircle((cx - 90), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy + 30;
+
+        // Draw next lower row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy + 30;
+
+        // Draw lowest row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy - 120;
+
+        // Draw next upper row of 7 spots
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle((cx + 60), cy, 10);
+        do Screen.drawCircle((cx + 90), cy, 10);
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx - 60), cy, 10);
+        do Screen.drawCircle((cx - 90), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of 3 spots
+        do Screen.drawCircle((cx - 30), cy, 10);
+        do Screen.drawCircle((cx + 30), cy, 10);
+        do Screen.drawCircle(cx, cy, 10);
+
+        // Reset center
+        let cx = x + 118;
+        let cy = y + 118;
+
+        // Draw middle row marbles - no marble on center spot
+        do Screen.setColor(true);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle((cx + 60), cy, 8);
+        do Screen.drawCircle((cx + 90), cy, 8);
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx - 60), cy, 8);
+        do Screen.drawCircle((cx - 90), cy, 8);
+
+        let cy = cy + 30;
+
+        // Draw next lower row marbles
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle((cx + 60), cy, 8);
+        do Screen.drawCircle((cx + 90), cy, 8);
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx - 60), cy, 8);
+        do Screen.drawCircle((cx - 90), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy + 30;
+
+        // Draw next lower row marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy + 30;
+
+        // Draw next lower row marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy - 120;
+
+        // Draw next upper row of marbles
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle((cx + 60), cy, 8);
+        do Screen.drawCircle((cx + 90), cy, 8);
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx - 60), cy, 8);
+        do Screen.drawCircle((cx - 90), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+
+        let cy = cy - 30;
+
+        // Draw next upper row of marbles
+        do Screen.drawCircle((cx - 30), cy, 8);
+        do Screen.drawCircle((cx + 30), cy, 8);
+        do Screen.drawCircle(cx, cy, 8);
+        
+        return;
+    }
+}

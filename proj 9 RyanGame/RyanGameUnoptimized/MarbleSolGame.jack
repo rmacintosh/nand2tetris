@@ -1,0 +1,124 @@
+/**
+ * Implements the Marble Solitaire game.
+ * In this game you have an array of marbles arranged in a plus sign,
+ * for a total of 44 marbles and one empty space. You must remove all 
+ * marbles on the board by jumping a marble directly next to it into
+ * and empty spot. You win if you have only one marble left, and lose
+ * if you have no more possible moves and have more than 1 marble left
+ * Arrow keys move you selection cursor around the board. Select a spot
+ * with the spacebar. If the spot is not selectable for a legal move 
+ * nothing happens, otherwise the spot is erased and possible moves are
+ * highlighted. If only one move is available the move is performed,
+ * otherwise you are shown possible moves and must select the move you 
+ * want. Q quits the game. 
+ */
+class MarbleSolGame {
+
+    // The board
+    field MarbleSol board;
+
+    static int up, down, left, right;
+    static char spacebar, upArrow, downArrow, leftArrow, rightArrow, buttonQ, nothing;
+
+    /** Constructs a new Game. */
+    constructor MarbleSolGame new() {
+        let board = MarbleSol.new();
+        let up         = 1;
+        let down       = 2;
+        let left       = 3;
+        let right      = 4;
+        let spacebar   = 32;
+        let upArrow    = 131;
+        let downArrow  = 133;
+        let leftArrow  = 130;
+        let rightArrow = 132;
+        let buttonQ    = 81;
+        let nothing    = 0;
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do board.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Starts the game. Handles inputs from the user that control
+     *  the cursor's movement. */
+    method void run() {
+        var char key;
+        var boolean exit;
+        var String exitMsg;
+
+        let exit = false;
+        let exitMsg = String.new(30);
+
+        do Output.moveCursor(3, 0);
+        do Output.printString("A marble may jump");
+        do Output.println();
+        do Output.printString("over one marble  ");
+        do Output.println();
+        do Output.printString("to an empty spot ");
+        do Output.println();
+        do Output.printString("to remove jumped ");
+        do Output.println();
+        do Output.printString("marble from game.");
+        do Output.println();
+        do Output.printString("1 marble left WIN");
+        do Output.moveCursor(10, 0);
+        do Output.printString("Spacebar = Select");
+        do Output.println();
+        do Output.moveCursor(12, 0);
+        do Output.printString("Move cursor with ");
+        do Output.println();
+        do Output.printString("directional keys ");
+        do Output.moveCursor(15, 0);
+        do Output.printString("Q = Exit Game");
+        
+        while (~exit) {
+            // waits for a key to be pressed.
+            while (key = nothing) {
+                let key = Keyboard.keyPressed();
+            }
+            if (key = buttonQ) {
+                let exit = true;
+                let exitMsg = "  GAME OVER: Exited by user.  ";
+            }
+            if (key = spacebar) {
+                do board.selectSpot();
+            }
+            if (key = upArrow) {
+                do board.moveCursor(up);
+            }
+            if (key = downArrow) {
+                do board.moveCursor(down);
+            }
+            if (key = leftArrow) {
+                do board.moveCursor(left);
+            }
+            if (key = rightArrow) {
+                do board.moveCursor(right);
+            }
+            // waits for the key to be released.
+            while (~(key = nothing)) {
+                let key = Keyboard.keyPressed();
+            }
+            if (board.gameWon()) {
+                let exit = true;
+                let exitMsg = "  CONGRATULATIONS!! You Won.  ";
+            }
+            if (board.gameLost()) {
+                let exit = true;
+                let exitMsg = "  You lost! No moves left!!!  ";
+            }
+        }
+        do Output.moveCursor(10, 17);
+        do Output.printString("                              ");
+        do Output.moveCursor(11, 17);
+        do Output.printString(exitMsg);
+        do Output.moveCursor(12, 17);
+        do Output.printString("                              ");
+        return;
+    }
+}
